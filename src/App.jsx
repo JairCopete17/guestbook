@@ -13,7 +13,7 @@ export default function App () {
   const [allWaves, setAllWaves] = useState([])
   const [count, setCount] = useState(0)
 
-  const contractAddress = '0xd0574944c2286370742FfFEec48B9915A5be1a52'
+  const contractAddress = '0xD7265A913D8a72CEB695De3204f0805b8585496f'
   const contractABI = abi.abi
 
   const getAllWaves = async () => {
@@ -99,7 +99,7 @@ export default function App () {
         setCount(count.toNumber())
         console.log('Retrieved total wave count: ', count.toNumber())
 
-        const waveTxn = await guestbookContract.wave('gm')
+        const waveTxn = await guestbookContract.wave('gm', { gasLimit: 300000 })
         console.log('⛏ Mining', waveTxn.hash)
         await waveTxn.wait()
         console.log('⚒ Mined', waveTxn.hash)
