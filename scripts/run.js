@@ -4,7 +4,7 @@ const main = async () => {
   const waveContract = await waveContractFactory.deploy();
   await waveContract.deployed();
 
-  console.log("Contract deployed to:", waveContract.address);
+  console.log("Contract address:", waveContract.address);
   console.log("Contract deployed by:", owner.address);
 
   // Set a variable for wave count
@@ -12,20 +12,15 @@ const main = async () => {
   waveCount = await waveContract.getTotalWaves();
 
   // Wave
-  let waveTxn = await waveContract.wave();
+  let waveTxn = await waveContract.wave("gm");
   await waveTxn.wait();
 
   // Wave from a random address
-  waveTxn = await waveContract.connect(randomPerson).wave();
+  waveTxn = await waveContract.connect(randomPerson).wave("gm");
   await waveTxn.wait();
 
-  // Store the address who waved to the contract
-  let addresses = [];
-  addresses.push(randomPerson.address);
-
-  // Get the new wave count and the new address who waved
-  waveCount = await waveContract.getTotalWaves();
-  console.log(addresses);
+  let allWaves = await waveContract.getAllWaves();
+  console.log(allWaves);
 };
 
 const runMain = async () => {
