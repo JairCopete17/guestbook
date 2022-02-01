@@ -3,12 +3,45 @@ import { useState, useEffect } from 'react'
 
 import abi from './utils/Guestbook.json'
 
+import Header from './components/Header'
+import Message from './components/Message'
+import Button from './components/Button'
+import Wavelist from './components/Wavelist'
+
 export default function App () {
   const [currentAccount, setCurrentAccount] = useState('')
+  const [allWaves, setAllWaves] = useState([])
   const [count, setCount] = useState(0)
 
-  const contractAddress = '0x5253ddfDdbaFb752Ca940f6dc7108faae4BD1946'
+  const contractAddress = '0xd0574944c2286370742FfFEec48B9915A5be1a52'
   const contractABI = abi.abi
+
+  const getAllWaves = async () => {
+    try {
+      const { ethereum } = window
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum)
+        const signer = provider.getSigner()
+        const guestbookContract = new ethers.Contract(contractAddress, contractABI, signer)
+
+        const waves = await guestbookContract.getAllWaves()
+
+        let wavesCleaned = []
+        waves.forEach(wave => {
+          wavesCleaned.push({
+            address: wave.waver,
+            timestamp: new Date(wave.timestamp * 1000),
+            message: wave.message
+          })
+        })
+
+        setAllWaves(wavesCleaned)
+      } else console.log('Ethereum object does not exist')
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -23,6 +56,7 @@ export default function App () {
         const account = accounts[0]
         console.log('Found an authorized account', account)
         setCurrentAccount(account)
+        getAllWaves()
       } else
         console.log('No authorized account found')
     } catch (error) {
@@ -32,6 +66,7 @@ export default function App () {
 
   useEffect(() => {
     checkIfWalletIsConnected()
+    getAllWaves()
   }, [])
 
   const connectWallet = async () => {
@@ -64,7 +99,7 @@ export default function App () {
         setCount(count.toNumber())
         console.log('Retrieved total wave count: ', count.toNumber())
 
-        const waveTxn = await guestbookContract.wave()
+        const waveTxn = await guestbookContract.wave('gm')
         console.log('⛏ Mining', waveTxn.hash)
         await waveTxn.wait()
         console.log('⚒ Mined', waveTxn.hash)
@@ -72,6 +107,7 @@ export default function App () {
         count = await guestbookContract.getTotalWaves()
         setCount(count.toNumber())
         console.log('Retrieved total wave count: ', count.toNumber())
+        getAllWaves()
       } else console.log('Ethereum object does not exist')
     } catch (error) {
       console.log(error)
@@ -79,31 +115,15 @@ export default function App () {
   }
 
   return (
-    <main className="mx-auto max-w-2xl py-12 md:min-h-screen md:py-0 flex flex-col items-center justify-center gap-6">
-      <header className="flex items-center gap-4">
-        <img
-          src="https://emojicdn.elk.sh/🌞?style=apple"
-          alt="Sun with face emoji"
-          className="w-10 h-10 md:w-16 md:h-16"
-        />
-        <h1 className="text-4xl font-bold">Guestbook</h1>
-      </header>
-      <p className="px-8">Hey there, here is the space where you can drop your gm.</p>
-      {count > 1 && <p className="px-8">Already {count} ppl drop their gm in the <strong>Guestbook!</strong></p>}
-      {currentAccount
-        ? <button
-            className="flex items-center justify-center text-lg px-12 py-3 rounded-2xl bg-gradient-to-r from-pink-600 to-yellow-600 hover:from-blue-600 hover:to-green-600 active:scale-75"
-            onClick={wave}
-          >
-            gm
-          </button>
-        : <button
-            className="flex items-center justify-center text-lg px-12 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-green-600 hover:from-pink-600 hover:to-yellow-600 active:scale-75"
-            onClick={connectWallet}
-          >
-            Connect Wallet
-          </button>
-      }
+    <main className="max-w-3xl min-h-screen mx-auto grid content-center py-4">
+      <Header />
+      <Message count={count} />
+      <Button
+        currentAccount={currentAccount}
+        wave={wave}
+        connectWallet={connectWallet}
+      />
+      <Wavelist allWaves={allWaves} />
     </main>
   )
 }
