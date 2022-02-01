@@ -6,8 +6,11 @@ export default function Wavelist ({ allWaves }) {
 
   return (
     <ul className="flex flex-col items-center gap-4 m-4">
-      {allWaves.map(wave => (
-          <li className="w-full bg-neutral-800 rounded-lg shadow-neutral-500 p-6">
+      {allWaves.map((wave, index) => (
+          <li
+            className="w-full bg-neutral-800 hover:bg-gradient-to-r from-pink-900 to-yellow-800 rounded-lg shadow-neutral-500 p-6"
+            key={index}
+          >
             <p>
               <span className="font-bold text-transparent bg-clip-text bg-gradient-to-br from-pink-400 to-cyan-400">
                 {wave.message}{" "}
