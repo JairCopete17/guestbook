@@ -1,15 +1,19 @@
-# Basic Sample Hardhat Project
+# `guestbook`
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+A web3 guestbook built with solidity + hardhat (for smart contract) and react + vite.
 
-Try running some of the following tasks:
+### Development
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
+Open [localhost:3000](http://localhost:3000) with your browser to see the result.
+
+```bash
+git clone git@github.com:JairCopete17/guestbook.git
+cd guestbook/
+npm install
+npm run dev
+
+# for deploying the smart contract
+npx hardhat run scripts/deploy.js --network rinkeby
 ```
+
+Create a `.env` file similar to `.env.example.`
